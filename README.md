@@ -28,7 +28,7 @@ For example, I will create a form of 2 questions. I also find it strange to show
 
 ![image](https://github.com/Epohandro/Google-for-Discord/assets/100685424/aca3445e-3d82-459f-88b2-40efccb9cf50)
 
-4. The next step is to insert the code that is in the file google-forms.js . It can also be edited, study the comments in the code.
+4. The next step is to insert the code that is in the file [google-forms.js](https://github.com/Epohandro/Google-for-Discord/blob/main/google-forms.js) . It can also be edited, study the comments in the code.
 
 ![image](https://github.com/Epohandro/Google-for-Discord/assets/100685424/5db22f01-6256-4b28-9e46-782df639df90)
 
