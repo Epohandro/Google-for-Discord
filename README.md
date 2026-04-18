@@ -30,7 +30,7 @@ For example, I will create a form of 2 questions. I also find it strange to show
 
 4. The next step is to insert the code that is in the file [google-forms.js]([https://github.com/Epohandro/Google-for-Discord/blob/main/google-forms.js](https://github.com/Epohandro/Google-for-Discord/releases)) . It can also be edited, study the comments in the code.
 
-![image]([https://github.com/Epohandro/Google-for-Discord/assets/100685424/5db22f01-6256-4b28-9e46-782df639df90](https://github.com/Epohandro/Google-for-Discord/releases))
+![image](https://github.com/user-attachments/assets/e68cf5ee-838e-4816-945e-f38296403b4d)
 
 5. After that, go to the triggers and configure them.
 
