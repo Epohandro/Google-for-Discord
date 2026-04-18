@@ -1,94 +1,82 @@
-const POST_URL = "WEBHOOK URL"; // You need to change the WEBHOOK URL to your url
+const POST_URL = "https://discord.com/api/webhooks/!"; 
 
-function onSubmit(e) 
-{
-    const response = e.response.getItemResponses();
+function onSubmit(e) {
+  try {
+    const response = e.response;
+    const form = FormApp.getActiveForm();
+    const itemResponses = response.getItemResponses();
+    
+    const responseNumber = form.getResponses().length; 
+    const adminUrl = "https://docs.google.com/forms/d/" + form.getId() + "/edit#responses"; // link to edit google forms
+
+    let userEmail = response.getRespondentEmail() || "Error";
+    let discordUserMention = "Error"; // 
     let items = [];
+    let embedColor = 16777215; 
 
-    for (const responseAnswer of response) 
-    {
-        const question = responseAnswer.getItem().getTitle();
-        const answer = responseAnswer.getResponse();
-        let parts = []
+    for (const responseAnswer of itemResponses) {
+      const question = responseAnswer.getItem().getTitle();
+      const answer = responseAnswer.getResponse();
+      const answerString = Array.isArray(answer) ? answer.join(", ") : answer.toString();
 
-        try 
-        {
-            parts = answer.match(/[\s\S]{1,1024}/g) || [];
-        } 
-        catch (e) 
-        {
-            parts = answer;
+      if (!answerString.trim()) continue;
+
+      const qLower = question.toLowerCase();
+      if (qLower.includes("your discord")) {
+        const isId = /^\d{17,19}$/.test(answerString.trim());
+        if (isId) {
+          discordUserMention = `<@${answerString.trim()}>`;
+        } else {
+          discordUserMention = `\`${answerString}\``;
         }
+      }
 
-        if (!answer) 
-        {
-            continue;
+// USE question blocks if it is appropriate in the form. The original form can be seen at the link https://forms.gle/fCRAdRoMkH9CgZSy8
+      if (question === "What do you want to do with this form?") { 
+        if (answerString.includes("Report a problem")) {
+          embedColor = 12597547;
+        } else if (answerString.includes("Create feedback")) {
+          embedColor = 5793266;
         }
+      }
 
-        for (const [index, part] of Object.entries(parts)) 
-        {
-            if (index == 0) 
-            {
-                items.push
-                ({
-                    "name": question,
-                    "value": part,
-                    "inline": false
-                });
-            } 
-            else 
-            {
-                items.push
-                ({
-                    "name": question.concat(" (cont.)"),
-                    "value": part,
-                    "inline": false
-                });
-            }
-        }
+      if (userEmail === "Error" && (qLower.includes("email") || qLower.includes("почта"))) {
+        userEmail = answerString;
+      }
+
+      const parts = combinedValue.match(/[\s\S]{1,1024}/g) || [];
+      parts.forEach((part, index) => {
+        items.push({
+          "name": index === 0 ? question : `${question} (next)`,
+          "value": part,
+          "inline": false
+        });
+      });
     }
 
-    const options = 
-    {
-        "method": "post",
-        "headers": 
-        {
-            "Content-Type": "application/json",
+    const payload = {
+      "content": "<@471250372841832448>", // mentioning the user before the message
+      "embeds": [{
+        "description": `### [Message №${responseNumber}](${adminUrl})\nUser mail: ${discordUserMention}\n`,
+        "fields": items,
+        "color": embedColor,
+        "footer": { 
+          "text": "user mail: " + userEmail,
         },
-        "payload": JSON.stringify
-        ({
-            // The value in quotation marks ( "" ) is optional
-            "content": "", // Text before sending the webhook
-            "embeds": 
-            [{
-                "title": "", // The title of the form
-                "fields": items,
-                "color": 886011, // Color design. You can view the decimal color codes at https://www.mathsisfun.com/hexadecimal-decimal-colors.html
-                "author": 
-                {
-                    "name": "", // Author name
-                    "url": "", // Author name link
-                    "icon_url": "" // Author image
-                },
-                "url": "", // Link on title
-                "thumbnail": 
-                {
-                    "url": "" // Thumbnail for embedding
-                },
-                "image": 
-                {
-                    "url": "" // Image for embedding
-                },
-                "footer": 
-                {
-                    "text": "by Epohandro", // Footer for embedding
-                    "icon_url": "" // Image in footer
-                },
-                "description": "", // Description for embedding
-                "timestamp": new Date().toISOString()
-            }]
-        })
+        "timestamp": new Date().toISOString()
+      }]
+    };
+
+    const options = {
+      "method": "post",
+      "contentType": "application/json",
+      "payload": JSON.stringify(payload),
+      "muteHttpExceptions": true
     };
 
     UrlFetchApp.fetch(POST_URL, options);
-};
+
+  } catch (err) {
+    console.error("Er: " + err.message);
+  }
+}
